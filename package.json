@@ -1,0 +1,14 @@
+{
+  "name": "m0narq-studio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Static site - use a static server like: npx serve .' && exit 0",
+    "build": "echo 'Static site - no build step needed' && exit 0"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14"
+  }
+}
