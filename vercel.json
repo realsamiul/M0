@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "public": true,
+  "rewrites": [
+    { "source": "/assets/(.*)", "dest": "/assets/$1" },
+    { "source": "/logo/(.*)", "dest": "/logo/$1" },
+    { "source": "/robots.txt", "dest": "/robots.txt" },
+    { "source": "/(.*)", "dest": "/index.html" }
+  ]
+}
