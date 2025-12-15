@@ -55,7 +55,7 @@
   const earth = new THREE.Mesh(geo, mat); earthGroup.add(earth);
 
   const TL = new THREE.TextureLoader(manager);
-  const CDN= 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/';
+  const CDN= 'assets/textures/';
   TL.load(CDN+'earth_atmos_2048.jpg', t=>{mat.map=t;    mat.needsUpdate=true});
   TL.load(CDN+'earth_specular_1024.jpg',t=>{mat.specularMap=t;mat.needsUpdate=true});
   TL.load(CDN+'earth_normal_1024.jpg',  t=>{mat.normalMap=t;  mat.needsUpdate=true});
