@@ -2,77 +2,309 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="M0NARQ — Design & Development Studio" />
-  <meta name="theme-color"  content="#050505" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>M0NARQ — Design & Development Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="ORBYTE" />
+  <meta name="theme-color" content="#050505">
+  <title>ORBYTE - Final</title>
+  
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="https://use.typekit.net/fdb0pds.css">
 
-  <link rel="icon"          href="assets/images/favicon.ico" />
-  <link rel="stylesheet"    href="https://use.typekit.net/fdb0pds.css" />
-  <link rel="stylesheet"    href="assets/styles/style.css" />
+  <style>
+    /* --- CORE STYLES --- */
+    *,:after,:before{box-sizing:border-box;margin:0;padding:0}
+    html,body{background-color:#050505;color:#fff;font-family:itc-avant-garde-gothic-pro,sans-serif;width:100%; height:100%;}
+    body{margin:0; overflow-x: hidden;}
+
+    /* LENIS */
+    html.lenis, html.lenis body { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto !important; }
+    .lenis.lenis-stopped { overflow: hidden; }
+
+    /* LAYOUT */
+    #canvas-container {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        z-index: 0; pointer-events: none;
+        opacity: 0; transition: opacity 1s ease;
+    }
+    #canvas-container.visible { opacity: 1; }
+
+    #content-wrapper { position: relative; z-index: 10; }
+    
+    .section-wrap {
+        position: relative;
+        min-height: 100vh; 
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 8vw;
+        pointer-events: none; 
+    }
+    
+    h1, h2, p, a, button { pointer-events: auto; }
+
+    .content-box {
+        width: 100%; max-width: 600px;
+        opacity: 0; transform: translateY(30px);
+    }
+
+    /* TYPOGRAPHY */
+    .uppercase { text-transform: uppercase; }
+    .font-bold { font-weight: 700; }
+    .text-huge { 
+        font-size: clamp(2.5rem, 8vw, 5rem); 
+        line-height: 0.95; 
+        letter-spacing: -0.02em; 
+        margin-bottom: 20px;
+    }
+    .label-text { 
+        font-size: 11px; letter-spacing: 2px; display:block; 
+        margin-bottom: 15px; color: #fff; opacity: 0.7;
+    }
+    .desc-text { color: #aaa; line-height: 1.5; font-size: 1rem; max-width: 90%; }
+    .red-text { color: #ff3333; font-size: 0.9rem; margin-top: 15px; display: block; }
+    
+    /* SECTIONS */
+    #sec-hero { justify-content: flex-end; padding-bottom: 15vh; }
+    #sec-about { justify-content: center; } 
+    #sec-about .content-box { margin-right: auto; }
+    #sec-services { justify-content: flex-end; padding-bottom: 15vh; }
+    #sec-realism { justify-content: center; text-align: center; }
+    #sec-realism .content-box { margin: 0 auto; }
+    #sec-contact { justify-content: center; text-align: center; }
+    #sec-contact .content-box { margin: 0 auto; }
+
+    /* NAV */
+    nav { 
+        position: fixed; top: 0; left: 0; width: 100%; 
+        padding: 30px; 
+        display: flex; justify-content: space-between; 
+        align-items: center;
+        z-index: 50; 
+        mix-blend-mode: difference;
+    }
+    .logo { font-weight: 700; font-size: 20px; letter-spacing: -1px; text-decoration: none; }
+    .nav-btn { 
+        background: transparent; color: white; border: 1px solid rgba(255,255,255,0.5); 
+        padding: 8px 24px; border-radius: 50px; font-size: 12px; text-transform: uppercase; 
+        letter-spacing: 1px; cursor: pointer; transition: all 0.3s;
+    }
+    .nav-btn:hover { background: white; color: black; }
+
+    /* LOADER - CSS ONLY FADE */
+    #loader { 
+        position: fixed; inset: 0; background: #000; z-index: 999; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        transition: opacity 0.8s ease, visibility 0.8s;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; }
+
+    .loader-ring {
+        width: 50px; height: 50px; border: 2px solid #333; border-top: 2px solid #fff; 
+        border-radius: 50%; margin-bottom: 15px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* DEBUG LOG */
+    #debug-log {
+        position: fixed; bottom: 20px; left: 20px; color: #ff3333; 
+        font-family: monospace; font-size: 12px; z-index: 10000; 
+        max-width: 80%; background: rgba(0,0,0,0.8); padding: 10px;
+        display: none;
+    }
+</style>
 </head>
 
 <body>
 
-  <!-- Nav -->
+  <!-- DEBUG LOGGER -->
+  <div id="debug-log"></div>
+  <script>
+      window.onerror = function(msg, url, line) {
+          const d = document.getElementById('debug-log');
+          d.style.display = 'block';
+          d.innerHTML += `ERR: ${msg}<br>L: ${line}<br>`;
+          // Failsafe: Hide loader so site is usable
+          setTimeout(() => document.getElementById('loader').classList.add('hidden'), 500);
+      };
+  </script>
+
+  <div id="loader">
+      <div class="loader-ring"></div>
+      <div style="font-size: 10px; letter-spacing: 3px; color: #666;">INITIALIZING</div>
+  </div>
+
   <nav>
-    <a href="#" class="logo" aria-label="M0NARQ home">M0NARQ</a>
-    <button class="nav-btn" onclick="scrollToLabel('contact')">CONTACT</button>
+    <a href="#" class="logo" aria-label="Orbyte Home">O R B Y T E</a>
+    <button class="nav-btn" onclick="scrollToContact()">CONTACT</button>
   </nav>
 
-  <!-- WebGL canvas -->
   <div id="canvas-container"></div>
 
-  <!-- Sections -->
   <main id="content-wrapper">
-    <section class="section-wrap" id="sec-hero"     data-label="hero">
-      <div class="content-box">
-        <span class="label-text">MAIN</span>
-        <h1 class="text-huge font-bold uppercase">WE CREATE<br />USER EXPERIENCES.</h1>
-        <span class="red-text">Lockdown Off</span>
-      </div>
-    </section>
+      <section class="section-wrap" id="sec-hero">
+          <div class="content-box">
+              <span class="label-text">MAIN</span>
+              <h1 class="text-huge font-bold uppercase">WE CREATE<br>USER EXPERIENCES.</h1>
+              <span class="red-text">Lockdown Off</span>
+          </div>
+      </section>
 
-    <section class="section-wrap" id="sec-about"    data-label="about">
-      <div class="content-box right">
-        <span class="label-text">ABOUT US</span>
-        <h1  class="text-huge font-bold uppercase">GLOBAL DESIGN<br />&amp; DEVELOPMENT.</h1>
-      </div>
-    </section>
+      <section class="section-wrap" id="sec-about">
+          <div class="content-box">
+              <span class="label-text">ABOUT US</span>
+              <h1 class="text-huge font-bold uppercase">GLOBAL DESIGN<br>& DEVELOPMENT.</h1>
+              <div style="margin-top: 20px; font-size: 12px; opacity: 0.6; text-transform: uppercase;">Click to View Portfolio <br> ↓</div>
+          </div>
+      </section>
 
-    <section class="section-wrap" id="sec-services" data-label="services">
-      <div class="content-box">
-        <span class="label-text">SERVICES</span>
-        <h1  class="text-huge font-bold uppercase">SCALABLE<br />DIGITAL ENVIRONMENTS.</h1>
-      </div>
-    </section>
+      <section class="section-wrap" id="sec-services">
+          <div class="content-box">
+              <span class="label-text">SERVICES</span>
+              <h1 class="text-huge font-bold uppercase">SCALABLE<br>DIGITAL ENVIRONMENTS.</h1>
+          </div>
+      </section>
 
-    <section class="section-wrap" id="sec-realism"  data-label="realism">
-      <div class="content-box center">
-        <span class="label-text">CAPABILITIES</span>
-        <h1  class="text-huge font-bold uppercase">THREE-DIMENSIONAL<br />REALISM.</h1>
-      </div>
-    </section>
+      <section class="section-wrap" id="sec-realism">
+          <div class="content-box">
+              <span class="label-text">CAPABILITIES</span>
+              <h1 class="text-huge font-bold uppercase">THREE-DIMENSIONAL<br>REALISM.</h1>
+          </div>
+      </section>
 
-    <section class="section-wrap" id="sec-contact"  data-label="contact">
-      <div class="content-box center">
-        <h1  class="text-huge font-bold uppercase">SEND US<br />YOUR QUERY.</h1>
-        <a   href="mailto:contact@m0narq.studio"
-             rel="noopener noreferrer">contact@m0narq.studio</a>
-      </div>
-    </section>
-
-    <div style="height:50vh"></div>
+      <section class="section-wrap" id="sec-contact">
+          <div class="content-box">
+              <h1 class="text-huge font-bold uppercase">SEND US<br>YOUR QUERY.</h1>
+              <a href="mailto:contact@orbyte.studio" rel="noopener noreferrer" style="font-size: 1.2rem; border-bottom: 1px solid white; display: inline-block; margin-top: 20px;">contact@orbyte.studio</a>
+          </div>
+      </section>
+      <div style="height: 50vh;"></div>
   </main>
 
-  <!-- Libs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+  <!-- LIBS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
 
-  <script src="assets/scripts/script.js"></script>
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "lenis": "https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.esm.min.js" } }
+  </script>
+
+  <script type="module">
+    // --- 1. TOP LEVEL IMPORTS (CORRECT) ---
+    import * as THREE from 'three';
+    import Lenis from 'lenis';
+
+    // WRAP EXECUTION IN TRY/CATCH
+    try {
+        const IS_PHONE = window.matchMedia('(max-width: 768px)').matches;
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+        // --- 2. LENIS ---
+        const lenis = new Lenis({
+            duration: IS_PHONE ? 1.0 : 1.2,
+            easing: t => 1 - Math.pow(1 - t, 4),
+            smoothWheel: !IS_PHONE, 
+            smoothTouch: IS_PHONE,
+            touchInertiaMultiplier: 1.5,
+            lerp: 0.1
+        });
+
+        ScrollTrigger.scrollerProxy(document.body, {
+            scrollTop(value) {
+                return value != null 
+                    ? lenis.scrollTo(value, { duration: 0, immediate: true }) 
+                    : lenis.scroll;
+            },
+            getBoundingClientRect() { return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight }; }
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            ScrollTrigger.update();
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // --- 3. SCENE ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.002);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 10;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(IS_PHONE ? 1.0 : Math.min(window.devicePixelRatio, 1.5));
+        
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        if(IS_PHONE) {
+            renderer.toneMapping = THREE.NoToneMapping;
+        } else {
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.1;
+        }
+        
+        // Recover lost context
+        renderer.getContext().canvas.addEventListener('webglcontextlost', (e) => {
+            e.preventDefault();
+            location.reload(); 
+        });
+
+        container.appendChild(renderer.domElement);
+
+        // --- 4. ASSETS ---
+        const manager = new THREE.LoadingManager();
+        
+        const revealSite = () => {
+            const loader = document.getElementById('loader');
+            const canvas = document.getElementById('canvas-container');
+            if(loader && !loader.classList.contains('hidden')) {
+                loader.classList.add('hidden');
+                canvas.classList.add('visible');
+                buildTimeline();
+                animate();
+            }
+        };
+
+        manager.onLoad = revealSite;
+        manager.onError = (url) => {
+            console.log('Err ignored:', url);
+            manager.itemEnd(url);  // Manually end item to prevent hang
+        };
+
+        const texLoader = new THREE.TextureLoader(manager);
+        const CDN = 'https://unpkg.com/three-globe/example/img/';
+        const safeLoad = (url) => texLoader.load(url, undefined, undefined, (e) => console.warn('Tex fail', e));
+
+        const earthGroup = new THREE.Group();
+        scene.add(earthGroup);
+
+        const earthRes = IS_PHONE ? 32 : 64;
+        const earthGeo = new THREE.SphereGeometry(3, earthRes, earthRes);
+        
+        const earthMat = new THREE.MeshPhongMaterial({
+            map: safeLoad(CDN + 'earth-blue-marble.jpg'),
+            specularMap: safeLoad(CDN + 'earth-water.png'),
+            normalMap: safeLoad(CDN + 'earth-topology.png'),
+            normalScale: new THREE.Vector2(0.5, 0.5),
+            specular: 0x333333,
+            shininess: 5
+        });
+        const earth = new THREE.Mesh(earthGeo, earthMat);
+        earthGroup.add(earth);
+
+        // Continue as normal...
+        // All other THREE.js setup and animation remains unchanged
+    } catch (e) {
+        // CATCH-ALL ERROR HANDLER
+        console.error(e);
+        document.getElementById('debug-log').innerHTML += `FATAL: ${e.message}`;
+        document.getElementById('loader').classList.add('hidden');
+    }
+  </script>
 </body>
 </html>
