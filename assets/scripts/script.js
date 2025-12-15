@@ -12,8 +12,7 @@
   const renderer = new THREE.WebGLRenderer({ antialias: !PHONE, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, PHONE ? 1.2 : 1.5));
   renderer.setSize(innerWidth, innerHeight);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.NoToneMapping;
+  renderer.outputEncoding = THREE.sRGBEncoding;  // Fixed issue with Three.js version mismatch
   document.getElementById('canvas-container').appendChild(renderer.domElement);
 
   renderer.getContext().canvas.addEventListener('webglcontextlost', e => {
@@ -153,4 +152,20 @@
     ScrollTrigger.refresh();
   });
   addEventListener('orientationchange', () => setTimeout(() => ScrollTrigger.refresh(), 350));
+
+  /* ----------------------------------------------------------- */
+  /* 7. FADE-IN CONTENT BOXES ANIMATION                          */
+  /* ----------------------------------------------------------- */
+  gsap.utils.toArray('.content-box').forEach(box => {
+    gsap.to(box, {
+      opacity: 1,
+      y: 0,
+      duration: 1,
+      scrollTrigger: {
+        trigger: box,
+        start: 'top 80%',
+        toggleActions: 'play none none reverse'
+      }
+    });
+  });
 })();
