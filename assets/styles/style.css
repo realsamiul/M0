@@ -1,120 +1,40 @@
-/* --- RESET & BASE --- */
-*,:after,:before{box-sizing:border-box;margin:0;padding:0}
-html,body{background-color:#050505;color:#fff;font-family:itc-avant-garde-gothic-pro,sans-serif;width:100%;}
-body{margin:0; overflow-x: hidden;}
+/* RESET & BASE -------------------------------------------------- */
+*,:before,:after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:itc-avant-garde-gothic-pro,sans-serif;background:#050505;color:#fff}
+body{overflow-x:hidden;}
 
-/* --- LAYOUT --- */
-#canvas-container {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    z-index: 0; pointer-events: none;
-    transition: opacity 1s ease;
-}
+/* CANVAS -------------------------------------------------------- */
+#canvas-container{position:fixed;inset:0;z-index:0;pointer-events:none;transition:opacity 1s}
 
-#content-wrapper { 
-    position: relative; 
-    z-index: 10;
-}
+/* LAYOUT -------------------------------------------------------- */
+#content-wrapper{position:relative;z-index:10}
+.section-wrap{min-height:100vh;display:flex;align-items:center;padding:0 8vw;pointer-events:none}
+.content-box{max-width:600px;opacity:0;transform:translateY(30px);pointer-events:auto}
+.content-box.right{margin-left:auto;text-align:right}
+.content-box.center{text-align:center;margin:0 auto}
 
-.section-wrap {
-    position: relative;
-    min-height: 100vh; 
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0 8vw;
-    pointer-events: none; 
-}
+/* TYPOGRAPHY ---------------------------------------------------- */
+.text-huge{font-size:clamp(2.2rem,8vw,4.8rem);line-height:.95;letter-spacing:-.02em;margin-bottom:20px}
+.font-bold{font-weight:700}
+.label-text{font-size:11px;letter-spacing:2px;margin-bottom:15px;opacity:.75}
+.red-text {color:#ff3333;font-size:.9rem;margin-top:15px;display:block}
+a{color:#fff;border-bottom:1px solid #fff;font-size:1.2rem;text-decoration:none}
 
-/* --- TYPOGRAPHY --- */
-.text-huge { 
-    font-size: clamp(2.5rem, 8vw, 5rem); 
-    line-height: 0.95; 
-    letter-spacing: -0.02em; 
-    margin-bottom: 20px;
-}
+/* NAV ----------------------------------------------------------- */
+nav{position:fixed;top:0;left:0;width:100%;padding:28px;display:flex;justify-content:space-between;align-items:center;z-index:50;mix-blend-mode:difference}
+.logo{font-size:20px;font-weight:700;letter-spacing:-1px;color:#fff;text-decoration:none}
+.nav-btn{background:none;color:#fff;border:1px solid rgba(255,255,255,.5);padding:8px 24px;border-radius:50px;font-size:12px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:.3s}
+.nav-btn:hover{background:#fff;color:#000}
 
-.font-bold { 
-    font-weight: 700; 
-}
+/* LOADER -------------------------------------------------------- */
+#loader{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#000;z-index:999}
+.loader-ring{width:50px;height:50px;border:2px solid #333;border-top:2px solid #fff;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:10px;letter-spacing:3px;color:#666}
 
-.label-text { 
-    font-size: 11px; 
-    letter-spacing: 2px; 
-    display:block; 
-    margin-bottom: 15px; 
-    color: #fff; 
-    opacity: 0.7;
-}
-
-.red-text { 
-    color: #ff3333; 
-    font-size: 0.9rem; 
-    margin-top: 15px; 
-    display: block;
-}
-
-/* --- NAVIGATION --- */
-nav { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    padding: 30px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    z-index: 50; 
-    mix-blend-mode: difference;
-}
-
-.logo { 
-    font-weight: 700; 
-    font-size: 20px; 
-    letter-spacing: -1px; 
-    text-decoration: none; 
-}
-
-.nav-btn { 
-    background: transparent; 
-    color: white; 
-    border: 1px solid rgba(255,255,255,0.5); 
-    padding: 8px 24px; 
-    border-radius: 50px; 
-    font-size: 12px; 
-    text-transform: uppercase; 
-    letter-spacing: 1px; 
-    cursor: pointer; 
-    transition: all 0.3s;
-}
-
-.nav-btn:hover { 
-    background: white; 
-    color: black; 
-}
-
-/* --- LOADER --- */
-#loader { 
-    position: fixed; inset: 0; 
-    background: #000; 
-    z-index: 999; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: center; 
-}
-
-.loader-ring {
-    width: 50px; 
-    height: 50px; 
-    border: 2px solid #333; 
-    border-top: 2px solid #fff; 
-    border-radius: 50%; 
-    margin-bottom: 15px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* MOBILE -------------------------------------------------------- */
+@media(max-width:768px){
+  nav{padding:22px 20px}
+  .section-wrap{padding:0 7vw}
+  .content-box.right{margin-left:0}
 }
