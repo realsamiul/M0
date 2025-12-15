@@ -4,31 +4,7 @@
 (() => {
 
   /* ----------------------------------------------------------- */
-  /* 1. PRE-LOADER MANAGER                                       */
-  /* ----------------------------------------------------------- */
-  const manager   = new THREE.LoadingManager();
-  const ring      = document.querySelector('.loader-ring');
-  manager.onProgress = (_, l, t) =>
-      ring.style.transform = `rotate(${(l/t)*360}deg)`;
-  manager.onLoad       = () => {
-    console.log('%cAll assets loaded ✔','color:#0f0');
-    fadeLoader();
-  };
-  manager.onError      = fadeLoader;
-
-  function fadeLoader() {
-    const el = document.getElementById('loader');
-    if (!el) return;
-    el.style.transition = 'opacity .5s';
-    el.style.opacity = 0;
-    setTimeout(()=>el.remove(), 600);
-  }
-
-  // Fallback timeout - hide loader after 4s no matter what
-  setTimeout(fadeLoader, 4000);
-
-  /* ----------------------------------------------------------- */
-  /* 2. THREE SCENE                                              */
+  /* 1. THREE SCENE                                              */
   /* ----------------------------------------------------------- */
   const PHONE   = matchMedia('(max-width:768px)').matches;
   const scene   = new THREE.Scene();
@@ -49,7 +25,7 @@
   });
 
   /* ----------------------------------------------------------- */
-  /* 3. EARTH, ATMOS, STARS, SUN                                 */
+  /* 2. EARTH, ATMOS, STARS, SUN                                 */
   /* ----------------------------------------------------------- */
   const earthGroup = new THREE.Group(); scene.add(earthGroup);
   const res   = PHONE?32:64;
@@ -60,10 +36,7 @@
   });
   const earth = new THREE.Mesh(geo, mat); earthGroup.add(earth);
 
-  // TextureLoader with manager - NOW properly initialized
-  const TL = new THREE.TextureLoader(manager);
-  
-  // Option 1: Use CDN textures (recommended - always works)
+  const TL = new THREE.TextureLoader();
   TL.load('https://planet-textures.s3.amazonaws.com/earth_daymap_2k.jpg', t=>{mat.map=t; mat.needsUpdate=true});
   TL.load('https://planet-textures.s3.amazonaws.com/earth_specular_1k.jpg',t=>{mat.specularMap=t;mat.needsUpdate=true});
   TL.load('https://planet-textures.s3.amazonaws.com/earth_normal_1k.jpg',  t=>{mat.normalMap=t;  mat.needsUpdate=true});
@@ -74,18 +47,6 @@
       earth.add(clouds);
   });
 
-  // Option 2: Use local textures (uncomment if you prefer local files)
-  // const CDN= 'assets/textures/';
-  // TL.load(CDN+'earth_atmos_2048.jpg', t=>{mat.map=t;    mat.needsUpdate=true});
-  // TL.load(CDN+'earth_specular_1024.jpg',t=>{mat.specularMap=t;mat.needsUpdate=true});
-  // TL.load(CDN+'earth_normal_1024.jpg',  t=>{mat.normalMap=t;  mat.needsUpdate=true});
-  // TL.load(CDN+'earth_clouds_1024.png',  t=>{
-  //     const clouds = new THREE.Mesh(geo.clone(),
-  //         new THREE.MeshPhongMaterial({map:t,transparent:true,opacity:.3,depthWrite:false}));
-  //     clouds.scale.set(1.015,1.015,1.015);
-  //     earth.add(clouds);
-  // });
-
   const atmos = new THREE.Mesh(geo.clone(), new THREE.ShaderMaterial({
     vertexShader: `varying vec3 n;void main(){n=normalize(normalMatrix*normal);
       gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);} `,
@@ -94,7 +55,7 @@
     side:THREE.BackSide, transparent:true, blending:THREE.AdditiveBlending}));
   atmos.scale.set(1.07,1.07,1.07); earthGroup.add(atmos);
 
-  const stars = (()=>{            //  ⭐️ star-field helper
+  const stars = (()=>{
     const count = PHONE?700:1800, pos=[];
     for(let i=0;i<count;i++) pos.push((Math.random()-.5)*600,(Math.random()-.5)*600,(Math.random()-.5)*600);
     const g = new THREE.BufferGeometry();
@@ -112,7 +73,7 @@
   scene.add(new THREE.AmbientLight(0x111122));
 
   /* ----------------------------------------------------------- */
-  /* 4. KEYFRAMES                                                */
+  /* 3. KEYFRAMES                                                */
   /* ----------------------------------------------------------- */
   const KF = PHONE ? {
     hero    : {pos:[ 0,  1.2,  0],  rotY:0,   sun:[ 10,5,5]},
@@ -129,7 +90,7 @@
   };
 
   /* ----------------------------------------------------------- */
-  /* 5. GSAP  TIMELINE                                           */
+  /* 4. GSAP  TIMELINE                                           */
   /* ----------------------------------------------------------- */
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
   let tl;
@@ -158,18 +119,18 @@
       .to(earthGroup.position,{x:kf.pos[0],y:kf.pos[1],z:kf.pos[2],duration:2},'<')
       .to(earthGroup.rotation,{y:kf.rotY,duration:2},'<')
       .to(sunMesh.position     ,{x:kf.sun[0],y:kf.sun[1],z:kf.sun[2],duration:2},'<')
-      .to(sunLight.position    ,{kf.sun[0],y:kf.sun[1],z:kf.sun[2],duration:2},'<');
+      .to(sunLight.position    ,{x:kf.sun[0],y:kf.sun[1],z:kf.sun[2],duration:2},'<');
     extra && extra();
   }
 
   /* ----------------------------------------------------------- */
-  /* 6. SCROLL HELPERS                                           */
+  /* 5. SCROLL HELPERS                                           */
   /* ----------------------------------------------------------- */
   window.scrollToLabel = label =>
     gsap.to(window,{duration:1.2,scrollTo:{y:`[data-label="${label}"]`,autoKill:false},ease:'power2.inOut'});
 
   /* ----------------------------------------------------------- */
-  /* 7. RENDER LOOP & EVENTS                                     */
+  /* 6. RENDER LOOP & EVENTS                                     */
   /* ----------------------------------------------------------- */
   renderer.setAnimationLoop(()=>{
     earth.rotation.y += .0005;
