@@ -3,74 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="M0NARQ - Design & Development Studio" />
-  <meta name="theme-color" content="#050505">
-  <title>M0NARQ - Design & Development Studio</title>
+  <meta name="description" content="M0NARQ — Design & Development Studio" />
+  <meta name="theme-color"  content="#050505" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>M0NARQ — Design & Development Studio</title>
 
-  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="https://use.typekit.net/fdb0pds.css">
-  <link rel="stylesheet" href="assets/styles/style.css">
+  <link rel="icon" href="assets/images/favicon.ico" />
+  <link rel="stylesheet" href="https://use.typekit.net/fdb0pds.css" />
+  <link rel="stylesheet" href="assets/styles/style.css" />
 </head>
 
 <body>
 
-  <!-- Preloader Section -->
-  <div id="loader">
-      <div class="loader-ring"></div>
-      <div style="font-size: 10px; letter-spacing: 3px; color: #666;">INITIALIZING...</div>
-  </div>
-
-  <!-- Navigation -->
+  <!-- Nav -->
   <nav>
-    <a href="#" class="logo" aria-label="M0NARQ Home">M0NARQ</a>
-    <button class="nav-btn" onclick="scrollToContact()">CONTACT</button>
+    <a href="#" class="logo" aria-label="M0NARQ home">M0NARQ</a>
+    <button class="nav-btn" onclick="scrollToLabel('contact')">CONTACT</button>
   </nav>
 
-  <!-- Canvas for 3D Globe Rendering -->
+  <!-- WebGL canvas -->
   <div id="canvas-container"></div>
 
-  <!-- Main Content -->
+  <!-- Sections -->
   <main id="content-wrapper">
-    <!-- Hero Section -->
-    <section id="sec-hero" class="section-wrap">
-        <div class="content-box">
-            <span class="label-text">MAIN</span>
-            <h1 class="text-huge font-bold uppercase">WE CREATE<br>USER EXPERIENCES.</h1>
-        </div>
+    <section class="section-wrap" id="sec-hero" data-label="hero">
+      <div class="content-box">
+        <span class="label-text">MAIN</span>
+        <h1 class="text-huge font-bold uppercase">WE CREATE<br />USER EXPERIENCES.</h1>
+        <span class="red-text">Lockdown Off</span>
+      </div>
     </section>
 
-    <!-- About Section -->
-    <section id="sec-about" class="section-wrap">
-        <div class="content-box">
-            <span class="label-text">ABOUT US</span>
-            <h1 class="text-huge font-bold uppercase">GLOBAL DESIGN<br>& DEVELOPMENT.</h1>
-        </div>
+    <section class="section-wrap" id="sec-about" data-label="about">
+      <div class="content-box right">
+        <span class="label-text">ABOUT US</span>
+        <h1  class="text-huge font-bold uppercase">GLOBAL DESIGN<br />&amp; DEVELOPMENT.</h1>
+      </div>
     </section>
 
-    <!-- Services Section -->
-    <section id="sec-services" class="section-wrap">
-        <div class="content-box">
-            <span class="label-text">SERVICES</span>
-            <h1 class="text-huge font-bold uppercase">SCALABLE<br>DIGITAL ENVIRONMENTS.</h1>
-        </div>
+    <section class="section-wrap" id="sec-services" data-label="services">
+      <div class="content-box">
+        <span class="label-text">SERVICES</span>
+        <h1  class="text-huge font-bold uppercase">SCALABLE<br />DIGITAL ENVIRONMENTS.</h1>
+      </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="sec-contact" class="section-wrap">
-        <div class="content-box">
-            <h1 class="text-huge font-bold uppercase">SEND US<br>YOUR QUERY.</h1>
-            <a href="mailto:contact@m0narq.studio" style="font-size: 1.2rem; border-bottom: 1px solid white;">contact@m0narq.studio</a>
-        </div>
+    <section class="section-wrap" id="sec-realism" data-label="realism">
+      <div class="content-box center">
+        <span class="label-text">CAPABILITIES</span>
+        <h1  class="text-huge font-bold uppercase">THREE-DIMENSIONAL<br />REALISM.</h1>
+      </div>
     </section>
-    <div style="height: 50vh;"></div>
+
+    <section class="section-wrap" id="sec-contact" data-label="contact">
+      <div class="content-box center">
+        <h1  class="text-huge font-bold uppercase">SEND US<br />YOUR QUERY.</h1>
+        <a href="mailto:contact@m0narq.studio" rel="noopener noreferrer">contact@m0narq.studio</a>
+      </div>
+    </section>
+
+    <div style="height:50vh"></div>
   </main>
 
-  <!-- JavaScript Files -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
-  <script src="assets/scripts/script.js"></script>
 
+  <script src="assets/scripts/script.js"></script>
 </body>
 </html>
