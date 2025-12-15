@@ -1,79 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="index, follow" />
-  <meta name="author" content="M0NARQ Studio" />
-
-  <!-- Fallback Title y Meta Description -->
-  <title>M0NARQ - Design & Development Studio</title>
-  <meta name="application-name" content="M0NARQ Studio">
-  <meta name="description" content="M0NARQ is an independent studio focused on creating scalable digital systems and immersive user experiences. We design and develop realistic 3D environments, interactive interfaces, and innovative web platforms." />
-  <meta name="keywords" content="m0narq, 3d development, interactive software, 3d web design, immersive experiences, digital design, web development" />
-
-  <!-- Imports -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  <link rel="icon" href="/logo/favicon-black.ico" media="(prefers-color-scheme: light)" type="image/x-icon" />
-  <link rel="icon" href="/logo/favicon-white.ico" media="(prefers-color-scheme: dark)" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="/logo/iso.jpg" />
-  <link rel="preload" href="/logo/logo.svg" as="image" />
-  <link rel="stylesheet" href="https://use.typekit.net/fdb0pds.css">
-
-  <!-- Canonical & Hreflang -->
-  <link rel="canonical" href="https://samiulkarim.online/" />
-  <link rel="alternate" href="https://samiulkarim.online/" hreflang="en" />
-  <link rel="alternate" href="https://samiulkarim.online/es" hreflang="es" />
-  <link rel="alternate" href="https://samiulkarim.online/fr" hreflang="fr" />
-  <link rel="alternate" href="https://samiulkarim.online/de" hreflang="de" />
-
-  <!-- Open Graph -->
-  <meta property="og:site_name" content="M0NARQ Studio" />
+  <meta name="description" content="M0NARQ - Design & Development Studio" />
+  <meta name="theme-color" content="#050505">
+  <meta name="author" content="M0NARQ">
   <meta property="og:title" content="M0NARQ - Design & Development Studio" />
-  <meta property="og:description" content="M0NARQ is an independent studio focused on creating scalable digital systems and immersive user experiences. We design and develop realistic 3D environments, interactive interfaces, and innovative web platforms." />
-  <meta property="og:image" content="https://samiulkarim.online/logo/og-image.jpg" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://samiulkarim.online/" />
-
-  <!-- Twitter Cards -->
+  <meta property="og:description" content="Innovative design and development studio." />
+  <meta property="og:image" content="assets/images/og-image.jpg" />
+  <meta property="og:url" content="https://m0narq.studio" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="M0NARQ - Design & Development Studio" />
-  <meta name="twitter:description" content="M0NARQ is an independent studio focused on creating scalable digital systems and immersive user experiences. We design and develop realistic 3D environments, interactive interfaces, and innovative web platforms." />
-  <meta name="twitter:image" content="https://samiulkarim.online/logo/og-image.jpg" />
-  <meta name="p:domain_verify" content="be7de3ed93c3164faedb2aef07e87e78"/>
+  <meta name="twitter:description" content="Innovative design and development studio." />
+  <meta name="twitter:image" content="assets/images/twitter-image.jpg" />
 
+  <title>M0NARQ - Design & Development Studio</title>
+  <link rel="canonical" href="https://m0narq.studio">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="assets/styles/style.css">
+  <link rel="stylesheet" href="https://use.typekit.net/fdb0pds.css"> <!-- Typekit Font -->
 
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "M0NARQ Studio",
-  "url": "https://samiulkarim.online",
-  "logo": "https://samiulkarim.online/logo/iso.jpg"
-}
-</script>
-
-  <!-- IMPORTANT: Added leading slashes for Vercel deployment -->
-  <script type="module" crossorigin src="/assets/index-CJhEmjua.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-DQ6fQa08.css">
 </head>
 
 <body>
-  <div id="root"></div>
+  <!-- Loader Section -->
+  <div id="loader">
+      <div class="loader-ring"></div>
+      <div>INITIALIZING...</div>
+  </div>
 
-  <noscript>
-    <div style="padding: 1rem; background-color: #f8d7da; color: #721c24; font-weight: bold;">
-      This site requires JavaScript to display the interactive 3D experience. Please enable JavaScript or visit our
-      <a href="/portfolio">portfolio</a> page for more information.
-    </div>
-  </noscript>
+  <!-- Navigation Bar -->
+  <nav>
+    <a href="#" class="logo" aria-label="M0NARQ Home">M0NARQ</a>
+    <button class="nav-btn" onclick="scrollToContact()">CONTACT</button>
+  </nav>
 
-  <!-- Removed Awwwards badge or update link if you want to keep it -->
-  <!-- <div id="awwwards" style="position: fixed; z-index: 999; transform: translateY(-50%); top: 50%; right: 0">
-    <a href="https://www.awwwards.com/sites/orbyte-studio" target="_blank">...</a>
-  </div> -->
+  <!-- Canvas Container for 3D Rendering -->
+  <div id="canvas-container"></div>
 
+  <!-- Main Content -->
+  <main id="content-wrapper">
+    <section id="sec-hero" class="section-wrap" role="region" aria-labelledby="h1-hero">
+        <div class="content-box">
+            <span class="label-text">MAIN</span>
+            <h1 id="h1-hero" class="text-huge font-bold uppercase">WE CREATE<br>USER EXPERIENCES.</h1>
+        </div>
+    </section>
+
+    <section id="sec-about" class="section-wrap" role="region" aria-labelledby="h1-about">
+        <div class="content-box">
+            <span class="label-text">ABOUT US</span>
+            <h1 id="h1-about" class="text-huge font-bold uppercase">GLOBAL DESIGN<br>& DEVELOPMENT.</h1>
+        </div>
+    </section>
+
+    <section id="sec-services" class="section-wrap" role="region" aria-labelledby="h1-services">
+        <div class="content-box">
+            <span class="label-text">SERVICES</span>
+            <h1 id="h1-services" class="text-huge font-bold uppercase">SCALABLE<br>DIGITAL ENVIRONMENTS.</h1>
+        </div>
+    </section>
+
+    <section id="sec-realism" class="section-wrap" role="region" aria-labelledby="h1-realism">
+        <div class="content-box">
+            <span class="label-text">CAPABILITIES</span>
+            <h1 id="h1-realism" class="text-huge font-bold uppercase">THREE-DIMENSIONAL<br>REALISM.</h1>
+        </div>
+    </section>
+
+    <section id="sec-contact" class="section-wrap" role="region" aria-labelledby="h1-contact">
+        <div class="content-box">
+            <h1 id="h1-contact" class="text-huge font-bold uppercase">SEND US<br>YOUR QUERY.</h1>
+            <a href="mailto:contact@m0narq.studio" rel="noopener noreferrer" style="font-size: 1.2rem; border-bottom: 1px solid white; display: inline-block; margin-top: 20px;">contact@m0narq.studio</a>
+        </div>
+    </section>
+    <div style="height: 50vh;"></div>
+  </main>
+
+  <!-- JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+  <script type="module" src="assets/scripts/script.js"></script>
 </body>
-
 </html>
