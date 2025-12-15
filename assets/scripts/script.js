@@ -1,139 +1,156 @@
-// --- 1. LoadingManager Setup ---
-const manager = new THREE.LoadingManager();
+(() => {
+  /* ----------------------------------------------------------- */
+  /* 1. THREE SCENE                                              */
+  /* ----------------------------------------------------------- */
+  const PHONE = matchMedia('(max-width:768px)').matches;
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x050505, .002);
 
-// Handle loading progress and completion
-manager.onProgress = (url, loaded, total) => {
-    console.log(`Loading: ${url} - Progress: ${Math.round((loaded / total) * 100)}%`);
-};
+  const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, .1, 100);
+  camera.position.z = 10;
 
-// On load completion, hide loader
-manager.onLoad = () => {
-  console.log('%cAll assets reported finished ✔', 'color:#0f0');
-  fadeLoader();
-};
+  const renderer = new THREE.WebGLRenderer({ antialias: !PHONE, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, PHONE ? 1.2 : 1.5));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.NoToneMapping;
+  document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-// Add a timeout to force hide the loader after 4 seconds, even if textures haven't loaded
-setTimeout(fadeLoader, 4000);
+  renderer.getContext().canvas.addEventListener('webglcontextlost', e => {
+    e.preventDefault(); location.reload();
+  });
 
-// --- 2. TextureLoader with manager ---
-const texLoader = new THREE.TextureLoader(manager);   // Now it's valid
+  /* ----------------------------------------------------------- */
+  /* 2. EARTH, ATMOS, STARS, SUN                                 */
+  /* ----------------------------------------------------------- */
+  const earthGroup = new THREE.Group();
+  scene.add(earthGroup);
+  const res = PHONE ? 32 : 64;
+  const geo = new THREE.SphereGeometry(3, res, res);
+  const mat = new THREE.MeshPhongMaterial({
+    color: 0x2255cc, shininess: 5, specular: 0x333333,
+    normalScale: new THREE.Vector2(.5, .5)
+  });
+  const earth = new THREE.Mesh(geo, mat);
+  earthGroup.add(earth);
 
-// --- 3. Scene Setup ---
-const container = document.getElementById('canvas-container');
-if (!container) {
-    console.error('No canvas container');
-    hideLoader();
-    throw new Error('No container');
-}
+  const TL = new THREE.TextureLoader();
+  TL.load('https://planet-textures.s3.amazonaws.com/earth_daymap_2k.jpg', t => {
+    mat.map = t; mat.needsUpdate = true;
+  });
+  TL.load('https://planet-textures.s3.amazonaws.com/earth_specular_1k.jpg', t => {
+    mat.specularMap = t; mat.needsUpdate = true;
+  });
+  TL.load('https://planet-textures.s3.amazonaws.com/earth_normal_1k.jpg', t => {
+    mat.normalMap = t; mat.needsUpdate = true;
+  });
+  TL.load('https://planet-textures.s3.amazonaws.com/earth_clouds_1k.png', t => {
+    const clouds = new THREE.Mesh(geo.clone(),
+      new THREE.MeshPhongMaterial({ map: t, transparent: true, opacity: .3, depthWrite: false }));
+    clouds.scale.set(1.015, 1.015, 1.015);
+    earth.add(clouds);
+  });
 
-const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x050505, 0.002);
+  const atmos = new THREE.Mesh(geo.clone(), new THREE.ShaderMaterial({
+    vertexShader: `varying vec3 n;void main(){n=normalize(normalMatrix*normal);
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);} `,
+    fragmentShader: `varying vec3 n;void main(){float i=pow(.6-dot(n,vec3(0,0,1)),3.);
+      gl_FragColor=vec4(.2,.6,1,1)*i;}`,
+    side: THREE.BackSide, transparent: true, blending: THREE.AdditiveBlending
+  }));
+  atmos.scale.set(1.07, 1.07, 1.07);
+  earthGroup.add(atmos);
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.z = 10;
+  const stars = (() => {
+    const count = PHONE ? 700 : 1800, pos = [];
+    for (let i = 0; i < count; i++) pos.push((Math.random() - .5) * 600, (Math.random() - .5) * 600, (Math.random() - .5) * 600);
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    return new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: .5, fog: false }));
+  })();
+  scene.add(stars);
 
-let renderer;
-try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    container.appendChild(renderer.domElement);
-} catch (e) {
-    console.error('WebGL failed:', e);
-    hideLoader();
-    throw e;
-}
+  const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(4, 32, 32),
+    new THREE.MeshBasicMaterial({ color: 0xffffee }));
+  sunMesh.position.set(20, 10, 0);
+  scene.add(sunMesh);
 
-// --- 4. Texture Loading using CDN ---
-const earthGeo = new THREE.SphereGeometry(3, 64, 64);
-const earthMat = new THREE.MeshPhongMaterial({
-    color: 0x1155cc,
-    emissive: 0x001122,
-    specular: 0x333333,
-    shininess: 10
-});
+  const sunLight = new THREE.DirectionalLight(0xffffff, 2);
+  sunLight.position.set(10, 5, 10);
+  scene.add(sunLight);
+  scene.add(new THREE.AmbientLight(0x111122));
 
-// Load textures
-texLoader.load('https://planet-textures.s3.amazonaws.com/earth_daymap_2k.jpg', (tex) => {
-    earthMat.map = tex;
-    earthMat.needsUpdate = true;
-});
-texLoader.load('https://planet-textures.s3.amazonaws.com/earth_normal_1k.jpg', (tex) => {
-    earthMat.normalMap = tex;
-    earthMat.needsUpdate = true;
-});
-texLoader.load('https://planet-textures.s3.amazonaws.com/earth_specular_1k.jpg', (tex) => {
-    earthMat.specularMap = tex;
-    earthMat.needsUpdate = true;
-});
+  /* ----------------------------------------------------------- */
+  /* 3. KEYFRAMES                                                */
+  /* ----------------------------------------------------------- */
+  const KF = PHONE ? {
+    hero: { pos: [0, 1.2, 0], rotY: 0, sun: [10, 5, 5] },
+    about: { pos: [0, 2.4, -10], rotY: 2, sun: [10, 5, 5] },
+    services: { pos: [1.5, -2, -6], rotY: 3.5, sun: [-3, 2, -5] },
+    realism: { pos: [0, 0, 0], rotY: 5, sun: [0, 0, -15] },
+    contact: { pos: [0, 0, -18], rotY: 5.5, sun: [0, 0, -15] }
+  } : {
+    hero: { pos: [3.5, 0, 0], rotY: 0, sun: [10, 5, 5] },
+    about: { pos: [0, 0, -8], rotY: 2, sun: [10, 5, 5] },
+    services: { pos: [4, -2, -2], rotY: 3.5, sun: [-6, 2, -5] },
+    realism: { pos: [0, 0, 0], rotY: 5, sun: [0, 0, -15] },
+    contact: { pos: [0, 0, -20], rotY: 5.5, sun: [0, 0, -15] }
+  };
 
-// --- 5. Earth Setup ---
-const earth = new THREE.Mesh(earthGeo, earthMat);
-scene.add(earth);
+  /* ----------------------------------------------------------- */
+  /* 4. GSAP TIMELINE                                           */
+  /* ----------------------------------------------------------- */
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+  let tl;
+  buildTimeline();
 
-// --- 6. Lighting Setup ---
-const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
-sunLight.position.set(5, 5, 5);
-scene.add(sunLight);
-scene.add(new THREE.AmbientLight(0x333333));
+  function buildTimeline() {
+    tl && tl.kill();
+    earthGroup.position.set(...KF.hero.pos);
 
-// --- 7. Animation ---
-function animate() {
-    requestAnimationFrame(animate);
-    earth.rotation.y += 0.0005;
+    tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#content-wrapper', start: 'top top', end: 'bottom bottom',
+        scrub: 1, snap: { snapTo: 'labels', duration: { min: .25, max: .8 }, ease: 'power1.inOut' }
+      }
+    });
+
+    append('hero', KF.hero);
+    append('about', KF.about);
+    append('services', KF.services);
+    append('realism', KF.realism);
+    append('contact', KF.contact, () => gsap.to('#canvas-container', { opacity: .3, pointerEvents: 'none', duration: 2 }));
+  }
+
+  function append(label, kf, extra) {
+    tl.addLabel(label)
+      .to(earthGroup.position, { x: kf.pos[0], y: kf.pos[1], z: kf.pos[2], duration: 2 }, '<')
+      .to(earthGroup.rotation, { y: kf.rotY, duration: 2 }, '<')
+      .to(sunMesh.position, { x: kf.sun[0], y: kf.sun[1], z: kf.sun[2], duration: 2 }, '<')
+      .to(sunLight.position, { x: kf.sun[0], y: kf.sun[1], z: kf.sun[2], duration: 2 }, '<');
+    extra && extra();
+  }
+
+  /* ----------------------------------------------------------- */
+  /* 5. SCROLL HELPERS                                           */
+  /* ----------------------------------------------------------- */
+  window.scrollToLabel = label =>
+    gsap.to(window, { duration: 1.2, scrollTo: { y: `[data-label="${label}"]`, autoKill: false }, ease: 'power2.inOut' });
+
+  /* ----------------------------------------------------------- */
+  /* 6. RENDER LOOP & EVENTS                                     */
+  /* ----------------------------------------------------------- */
+  renderer.setAnimationLoop(() => {
+    earth.rotation.y += .0005;
+    stars.rotation.y -= .0001;
     renderer.render(scene, camera);
-}
+  });
 
-animate();
-
-// --- 8. ScrollTrigger Animations ---
-gsap.to(camera.position, {
-    z: 7,
-    scrollTrigger: {
-        trigger: '.section-wrap',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: true
-    }
-});
-
-gsap.to(earth.rotation, {
-    y: Math.PI * 2,
-    scrollTrigger: {
-        trigger: '.section-wrap',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: true
-    }
-});
-
-// --- Helper Functions ---
-function fadeLoader() {
-    const loader = document.getElementById('loader');
-    if (loader) {
-        loader.style.transition = 'opacity 0.5s';
-        loader.style.opacity = '0';
-        setTimeout(() => {
-            if (loader.parentNode) loader.parentNode.removeChild(loader);
-        }, 500);
-    }
-}
-
-function hideLoader() {
-    const loader = document.getElementById('loader');
-    if (loader) {
-        loader.style.transition = 'opacity 0.5s';
-        loader.style.opacity = '0';
-        setTimeout(() => {
-            if (loader.parentNode) loader.parentNode.removeChild(loader);
-        }, 500);
-    }
-}
-
-// --- Scroll To Contact Function ---
-function scrollToContact() {
-    const contactSection = document.getElementById('sec-contact');
-    if (contactSection) {
-        contactSection.scrollIntoView({ behavior: 'smooth' });
-    }
-}
+  addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    ScrollTrigger.refresh();
+  });
+  addEventListener('orientationchange', () => setTimeout(() => ScrollTrigger.refresh(), 350));
+})();
