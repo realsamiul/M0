@@ -10,7 +10,10 @@
   const ring      = document.querySelector('.loader-ring');
   manager.onProgress = (_, l, t) =>
       ring.style.transform = `rotate(${(l/t)*360}deg)`;
-  manager.onLoad       = fadeLoader;
+  manager.onLoad       = () => {
+    console.log('%cAll assets loaded ✔','color:#0f0');
+    fadeLoader();
+  };
   manager.onError      = fadeLoader;
 
   function fadeLoader() {
@@ -20,6 +23,9 @@
     el.style.opacity = 0;
     setTimeout(()=>el.remove(), 600);
   }
+
+  // Fallback timeout - hide loader after 4s no matter what
+  setTimeout(fadeLoader, 4000);
 
   /* ----------------------------------------------------------- */
   /* 2. THREE SCENE                                              */
@@ -54,17 +60,31 @@
   });
   const earth = new THREE.Mesh(geo, mat); earthGroup.add(earth);
 
+  // TextureLoader with manager - NOW properly initialized
   const TL = new THREE.TextureLoader(manager);
-  const CDN= 'assets/textures/';
-  TL.load(CDN+'earth_atmos_2048.jpg', t=>{mat.map=t;    mat.needsUpdate=true});
-  TL.load(CDN+'earth_specular_1024.jpg',t=>{mat.specularMap=t;mat.needsUpdate=true});
-  TL.load(CDN+'earth_normal_1024.jpg',  t=>{mat.normalMap=t;  mat.needsUpdate=true});
-  TL.load(CDN+'earth_clouds_1024.png',  t=>{
+  
+  // Option 1: Use CDN textures (recommended - always works)
+  TL.load('https://planet-textures.s3.amazonaws.com/earth_daymap_2k.jpg', t=>{mat.map=t; mat.needsUpdate=true});
+  TL.load('https://planet-textures.s3.amazonaws.com/earth_specular_1k.jpg',t=>{mat.specularMap=t;mat.needsUpdate=true});
+  TL.load('https://planet-textures.s3.amazonaws.com/earth_normal_1k.jpg',  t=>{mat.normalMap=t;  mat.needsUpdate=true});
+  TL.load('https://planet-textures.s3.amazonaws.com/earth_clouds_1k.png',  t=>{
       const clouds = new THREE.Mesh(geo.clone(),
           new THREE.MeshPhongMaterial({map:t,transparent:true,opacity:.3,depthWrite:false}));
       clouds.scale.set(1.015,1.015,1.015);
       earth.add(clouds);
   });
+
+  // Option 2: Use local textures (uncomment if you prefer local files)
+  // const CDN= 'assets/textures/';
+  // TL.load(CDN+'earth_atmos_2048.jpg', t=>{mat.map=t;    mat.needsUpdate=true});
+  // TL.load(CDN+'earth_specular_1024.jpg',t=>{mat.specularMap=t;mat.needsUpdate=true});
+  // TL.load(CDN+'earth_normal_1024.jpg',  t=>{mat.normalMap=t;  mat.needsUpdate=true});
+  // TL.load(CDN+'earth_clouds_1024.png',  t=>{
+  //     const clouds = new THREE.Mesh(geo.clone(),
+  //         new THREE.MeshPhongMaterial({map:t,transparent:true,opacity:.3,depthWrite:false}));
+  //     clouds.scale.set(1.015,1.015,1.015);
+  //     earth.add(clouds);
+  // });
 
   const atmos = new THREE.Mesh(geo.clone(), new THREE.ShaderMaterial({
     vertexShader: `varying vec3 n;void main(){n=normalize(normalMatrix*normal);
@@ -138,7 +158,7 @@
       .to(earthGroup.position,{x:kf.pos[0],y:kf.pos[1],z:kf.pos[2],duration:2},'<')
       .to(earthGroup.rotation,{y:kf.rotY,duration:2},'<')
       .to(sunMesh.position     ,{x:kf.sun[0],y:kf.sun[1],z:kf.sun[2],duration:2},'<')
-      .to(sunLight.position    ,{x:kf.sun[0],y:kf.sun[1],z:kf.sun[2],duration:2},'<');
+      .to(sunLight.position    ,{kf.sun[0],y:kf.sun[1],z:kf.sun[2],duration:2},'<');
     extra && extra();
   }
 
